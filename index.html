@@ -1,201 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.js"></script>
-  </head>
-  <body>
-    <div id="specificChart" class="donut-size">
-      <div class="pie-wrapper">
-        <span class="label">
-          <span class="num">0</span><span class="smaller">%</span>
-        </span>
-        <div class="pie">
-          <div class="left-side half-circle"></div>
-          <div class="right-side half-circle"></div>
-        </div>
-        <div class="shadow"></div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.js"></script>
+</head>
+
+<body>
+  <div id="specificChart" class="donut-size">
+    <div class="pie-wrapper">
+      <span class="label">
+        <span class="num">0</span><span class="smaller">%</span>
+      </span>
+      <div class="pie">
+        <div class="left-side half-circle"></div>
+        <div class="right-side half-circle"></div>
       </div>
+      <div class="shadow"></div>
     </div>
-  </body>
-  <style>
-    @import url(https://fonts.googleapis.com/css?family=Lato:700);
-    *,
-    *:before,
-    *:after {
-      box-sizing: border-box;
+  </div>
+  <div>
+    <p id="datas"></p>
+  </div>
+</body>
+<style>
+  @import url(https://fonts.googleapis.com/css?family=Lato:700);
+
+  *,
+  *:before,
+  *:after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    background: #ecf0f1;
+    padding: 10px;
+    color: #444;
+    font-family: "Lato", Tahoma, Geneva, sans-serif;
+    font-size: 16px;
+  }
+
+  #percent {
+    display: block;
+    width: 160px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 50px auto 20px;
+    padding: 10px;
+    color: #1abc9c;
+    font-family: "Lato", Tahoma, Geneva, sans-serif;
+    font-size: 35px;
+    text-align: center;
+  }
+
+  #donut {
+    display: block;
+    margin: 0px auto;
+    color: #1abc9c;
+    font-size: 20px;
+    text-align: center;
+  }
+
+  p {
+    max-width: 600px;
+    margin: 12px auto;
+    font-weight: normal;
+    font-family: sans-serif;
+  }
+
+  code {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 0px 4px;
+  }
+
+  .donut-size {
+    font-size: 12em;
+  }
+
+  .pie-wrapper {
+    position: relative;
+    width: 1em;
+    height: 1em;
+    margin: 0px auto;
+  }
+
+  .pie-wrapper .pie {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    clip: rect(0, 1em, 1em, 0.5em);
+  }
+
+  .pie-wrapper .half-circle {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    border: 0.1em solid #1abc9c;
+    border-radius: 50%;
+    clip: rect(0em, 0.5em, 1em, 0em);
+  }
+
+  .pie-wrapper .right-side {
+    transform: rotate(0deg);
+  }
+
+  .pie-wrapper .label {
+    position: absolute;
+    top: 0.52em;
+    right: 0.4em;
+    bottom: 0.4em;
+    left: 0.4em;
+    display: block;
+    background: none;
+    border-radius: 50%;
+    color: #7f8c8d;
+    font-size: 0.25em;
+    line-height: 2.6em;
+    text-align: center;
+    cursor: default;
+    z-index: 2;
+  }
+
+  .pie-wrapper .smaller {
+    padding-bottom: 20px;
+    color: #bdc3c7;
+    font-size: 0.45em;
+    vertical-align: super;
+  }
+
+  .pie-wrapper .shadow {
+    width: 100%;
+    height: 100%;
+    border: 0.1em solid #bdc3c7;
+    border-radius: 50%;
+  }
+</style>
+<script>
+  /**
+   * Updates the donut chart's percent number and the CSS positioning of the progress bar.
+   * Also allows you to set if it is a donut or pie chart
+   * @param  {string}  el      The selector for the donut to update. '#thing'
+   * @param  {number}  percent Passing in 22.3 will make the chart show 22%
+   * @param  {boolean} donut   True shows donut, false shows pie
+   */
+
+  function updateDonutChart(el, percent,bruto,num, donut,tela) {
+    percent = Math.round(percent);
+    if (percent > 100) {
+      percent = 100;
+    } else if (percent < 0) {
+      percent = 0;
     }
 
-    html,
-    body {
-      background: #ecf0f1;
-      padding: 10px;
-      color: #444;
-      font-family: "Lato", Tahoma, Geneva, sans-serif;
-      font-size: 16px;
+    percent = (num * 100)/bruto;
+    
+    var deg = Math.round(360 * (percent / 100));
+
+    if (percent > 50) {
+      $(el + " .pie").css("clip", "rect(auto, auto, auto, auto)");
+      $(el + " .right-side").css("transform", "rotate(180deg)");
+    } else {
+      $(el + " .pie").css("clip", "rect(0, 1em, 1em, 0.5em)");
+      $(el + " .right-side").css("transform", "rotate(0deg)");
+    }
+    if (donut) {
+      $(el + " .right-side").css("border-width", "0.1em");
+      $(el + " .left-side").css("border-width", "0.1em");
+      $(el + " .shadow").css("border-width", "0.1em");
+    } else {
+      $(el + " .right-side").css("border-width", "0.5em");
+      $(el + " .left-side").css("border-width", "0.5em");
+      $(el + " .shadow").css("border-width", "0.5em");
     }
 
-    #percent {
-      display: block;
-      width: 160px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      margin: 50px auto 20px;
-      padding: 10px;
-      color: #1abc9c;
-      font-family: "Lato", Tahoma, Geneva, sans-serif;
-      font-size: 35px;
-      text-align: center;
-    }
+    $(el + " .num").text(tela);
+    $(el + " .left-side").css("transform", "rotate(" + deg + "deg)");
+  }
 
-    #donut {
-      display: block;
-      margin: 0px auto;
-      color: #1abc9c;
-      font-size: 20px;
-      text-align: center;
-    }
 
-    p {
-      max-width: 600px;
-      margin: 12px auto;
-      font-weight: normal;
-      font-family: sans-serif;
-    }
+  porcentagem = (bruto,num)=>{
+    return bruto/num;
+  }
 
-    code {
-      background: #fafafa;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-      padding: 0px 4px;
-    }
+  // Pass in a number for the percent
+  //updateDonutChart("#specificChart", 17, true);
 
-    .donut-size {
-      font-size: 12em;
-    }
+  function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        var tela = minutes + ":" + seconds;
+        display.textContent = tela;
 
-    .pie-wrapper {
-      position: relative;
-      width: 1em;
-      height: 1em;
-      margin: 0px auto;
-    }
-    .pie-wrapper .pie {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      height: 100%;
-      clip: rect(0, 1em, 1em, 0.5em);
-    }
-    .pie-wrapper .half-circle {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      height: 100%;
-      border: 0.1em solid #1abc9c;
-      border-radius: 50%;
-      clip: rect(0em, 0.5em, 1em, 0em);
-    }
-    .pie-wrapper .right-side {
-      transform: rotate(0deg);
-    }
-    .pie-wrapper .label {
-      position: absolute;
-      top: 0.52em;
-      right: 0.4em;
-      bottom: 0.4em;
-      left: 0.4em;
-      display: block;
-      background: none;
-      border-radius: 50%;
-      color: #7f8c8d;
-      font-size: 0.25em;
-      line-height: 2.6em;
-      text-align: center;
-      cursor: default;
-      z-index: 2;
-    }
-    .pie-wrapper .smaller {
-      padding-bottom: 20px;
-      color: #bdc3c7;
-      font-size: 0.45em;
-      vertical-align: super;
-    }
-    .pie-wrapper .shadow {
-      width: 100%;
-      height: 100%;
-      border: 0.1em solid #bdc3c7;
-      border-radius: 50%;
-    }
-  </style>
-  <script>
-    /**
-     * Updates the donut chart's percent number and the CSS positioning of the progress bar.
-     * Also allows you to set if it is a donut or pie chart
-     * @param  {string}  el      The selector for the donut to update. '#thing'
-     * @param  {number}  percent Passing in 22.3 will make the chart show 22%
-     * @param  {boolean} donut   True shows donut, false shows pie
-     */
-    function updateDonutChart(el, percent, donut) {
-      percent = Math.round(percent);
-      if (percent > 100) {
-        percent = 100;
-      } else if (percent < 0) {
-        percent = 0;
-      }
-      var deg = Math.round(360 * (percent / 100));
+        updateDonutChart("#specificChart",0,duration,timer, true,tela);
+        console.log(duration);
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+}
 
-      if (percent > 50) {
-        $(el + " .pie").css("clip", "rect(auto, auto, auto, auto)");
-        $(el + " .right-side").css("transform", "rotate(180deg)");
-      } else {
-        $(el + " .pie").css("clip", "rect(0, 1em, 1em, 0.5em)");
-        $(el + " .right-side").css("transform", "rotate(0deg)");
-      }
-      if (donut) {
-        $(el + " .right-side").css("border-width", "0.1em");
-        $(el + " .left-side").css("border-width", "0.1em");
-        $(el + " .shadow").css("border-width", "0.1em");
-      } else {
-        $(el + " .right-side").css("border-width", "0.5em");
-        $(el + " .left-side").css("border-width", "0.5em");
-        $(el + " .shadow").css("border-width", "0.5em");
-      }
-      $(el + " .num").text(percent);
-      $(el + " .left-side").css("transform", "rotate(" + deg + "deg)");
-    }
+window.onload = function () {
+    var duration = 60 * 5; // Converter para segundos
+        display = document.querySelector('#datas'); // selecionando o timer
+    startTimer(duration, display); // iniciando o timer
+};
 
-    // Pass in a number for the percent
-    updateDonutChart("#specificChart", 17, true);
+</script>
 
-    //Ignore the rest, it's for the input and checkbox
-
-    // $("#percent")
-    //   .change(function () {
-    //     var percent = $(this).val();
-    //     var donut = $("#donut input").is(":checked");
-    //     updateDonutChart("#specificChart", percent, donut);
-    //   })
-    //   .keyup(function () {
-    //     var percent = $(this).val();
-    //     var donut = $("#donut input").is(":checked");
-    //     updateDonutChart("#specificChart", percent, donut);
-    //   });
-
-    // $("#donut input").change(function () {
-    //   var donut = $("#donut input").is(":checked");
-    //   var percent = $("#percent").val();
-    //   if (donut) {
-    //     $("#donut span").html("Donut");
-    //   } else {
-    //     $("#donut span").html("Pie");
-    //   }
-    //   updateDonutChart("#specificChart", percent, donut);
-    // });
-  </script>
 </html>
